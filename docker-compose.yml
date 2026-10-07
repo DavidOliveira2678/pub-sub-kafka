@@ -17,6 +17,14 @@ services:
     depends_on:
       - kafka1
 
+  watermark:
+    build: watermark-app
+    container_name: watermark
+    volumes:
+      - ./appdata:/appdata
+    depends_on:
+      - kafka1
+
   upload:
     build: upload-app
     container_name: upload
@@ -90,15 +98,15 @@ services:
       - ./data/kafka3/data:/var/lib/kafka/data
     depends_on:
       - zookeeper
-      
-  # kafdrop:
-  #   image: obsidiandynamics/kafdrop
-  #   restart: "no"
-  #   ports:
-  #     - "9000:9000"
-  #   environment:
-  #     KAFKA_BROKERCONNECT: "kafka1:19091"
-  #   depends_on:
-  #     - kafka1
-  #     - kafka2
-  #     - kafka3
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka1:19091"
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3

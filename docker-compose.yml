@@ -110,3 +110,11 @@ services:
       - kafka1
       - kafka2
       - kafka3
+
+  notificador:
+    build: notificador-app
+    container_name: notificador
+    env_file:
+      - .env
+    depends_on:
+      - kafka1

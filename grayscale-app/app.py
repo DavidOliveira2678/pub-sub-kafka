@@ -23,6 +23,16 @@ def create_grayscale(path_file):
 
 #sleep(30)
 ### Consumer
+from confluent_kafka import Producer
+import uuid
+
+producer = Producer({'bootstrap.servers': 'kafka1:19091,kafka2:19092,kafka3:19093'})
+
+def notify(filename, operation):
+    msg = json.dumps({'file': filename, 'operation': operation})
+    producer.produce('notificacao', key=str(uuid.uuid4()), value=msg)
+    producer.flush()
+
 c = Consumer({
     'bootstrap.servers': 'kafka1:19091,kafka2:19092,kafka3:19093',
     'group.id': 'grayscale-group',
@@ -46,6 +56,7 @@ try:
             logging.warning(f"READING {filename}")
             create_grayscale(IN_FOLDER + filename)
             logging.warning (f"ENDING {filename}")
+            notify(filename, "convertido para preto e branco")
         elif msg.error().code() == KafkaError._PARTITION_EOF:
             logging.warning('End of partition reached {0}/{1}'
                   .format(msg.topic(), msg.partition()))
